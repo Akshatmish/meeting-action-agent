@@ -14,6 +14,7 @@ from config import Config
 from main import run as run_pipeline
 from agent import transcribe_audio, reset_azure_client
 from logger import get_logger
+from email_sender import send_share_link_email
 
 logger = get_logger("web_server")
 
@@ -92,6 +93,26 @@ def get_status():
         "jira": bool(Config.JIRA_API_TOKEN and Config.JIRA_URL),
         "work_iq": bool(Config.WORK_IQ_ENDPOINT and Config.WORK_IQ_API_KEY),
     }
+
+
+@app.post("/api/share-link")
+def share_meeting_link(payload: dict):
+    try:
+        meeting_url = payload.get("meeting_url")
+        to_email = payload.get("email")
+        organizer_name = payload.get("organizer_name", "MeetingActionAgent")
+        
+        if not meeting_url or not to_email:
+            raise HTTPException(status_code=400, detail="Missing meeting_url or email")
+            
+        if not Config.SENDGRID_API_KEY:
+            raise HTTPException(status_code=400, detail="SendGrid is not configured. Please verify your API Key.")
+            
+        send_share_link_email(to_email, meeting_url, organizer_name)
+        return {"status": "success", "message": f"Meeting link shared with {to_email}"}
+    except Exception as e:
+        logger.error(f"Failed to share meeting link: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/process")

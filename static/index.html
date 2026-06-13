@@ -294,6 +294,14 @@
                                 </div>
                             </div>
                             
+                            <div class="input-group" style="margin-top: 15px;">
+                                <label for="meeting-share-email">Share Meeting Link With (Email)</label>
+                                <div class="input-with-button">
+                                    <input type="email" id="meeting-share-email" placeholder="e.g. ravichahar442@gmail.com">
+                                    <button type="button" class="btn btn-secondary btn-sm" id="send-meet-link-btn" style="background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; border: none;"><i class="fa-solid fa-paper-plane"></i> Send Link</button>
+                                </div>
+                            </div>
+                            
                             <div class="live-connection-status" id="live-connection-card" style="display: none;">
                                 <div class="status-header">
                                     <span class="pulse-indicator"></span>
@@ -527,6 +535,10 @@
             // Reset app
             const resetBtn = document.getElementById('reset-app-btn');
             if (resetBtn) resetBtn.addEventListener('click', resetApp);
+
+            // Send share meeting link button
+            const sendMeetLinkBtn = document.getElementById('send-meet-link-btn');
+            if (sendMeetLinkBtn) sendMeetLinkBtn.addEventListener('click', shareMeetingLinkEmail);
         }
 
         // Setup global bouncing animations on click
@@ -792,6 +804,56 @@
                 .catch(err => {
                     console.error("Failed to fetch integration status:", err);
                 });
+        }
+
+        // Share meeting link directly via email
+        function shareMeetingLinkEmail() {
+            const btn = document.getElementById('send-meet-link-btn');
+            const emailInput = document.getElementById('meeting-share-email');
+            const meetingUrlInput = document.getElementById('meeting-url');
+            
+            const email = emailInput.value.trim();
+            const meetingUrl = meetingUrlInput.value.trim();
+            const organizerName = document.getElementById('organizer-name').value.trim();
+            
+            if (!meetingUrl) {
+                alert('Please enter a Meeting Invitation URL first.');
+                return;
+            }
+            if (!email) {
+                alert('Please enter a recipient email address.');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+            
+            fetch('/api/share-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    meeting_url: meetingUrl,
+                    email: email,
+                    organizer_name: organizerName
+                })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(data => { throw new Error(data.detail || 'Failed to send'); });
+                }
+                return res.json();
+            })
+            .then(data => {
+                alert('Success! Meeting invitation link sent to ' + email);
+                emailInput.value = '';
+            })
+            .catch(err => {
+                alert('Error sharing link: ' + err.message);
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Link';
+            });
         }
 
         function updateStatusIndicator(elementId, isConfigured, hasFallback = false) {

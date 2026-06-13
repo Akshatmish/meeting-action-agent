@@ -159,3 +159,53 @@ def send_all_emails(emails: list, summary: str, action_items: list, decisions: l
         except Exception as e:
             logger.error(f"Email failed for {email}: {e}")
     logger.info(f"Emails: {sent}/{len(emails)} sent")
+
+
+def send_share_link_email(to_email: str, meeting_url: str, organizer_name: str = ""):
+    from_name = f"{organizer_name} via MeetingActionAgent" if organizer_name else "MeetingActionAgent"
+    
+    html = f"""
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#2d3748;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#4f46e5,#4338ca);padding:24px;color:white;text-align:center">
+            <h2 style="margin:0;font-size:20px">🔗 Meeting Invitation Link</h2>
+        </div>
+        <div style="padding:24px;background:white;line-height:1.6">
+            <p>Hello,</p>
+            <p>You have been invited to join a virtual meeting. Click the button below to join:</p>
+            <div style="text-align:center;margin:30px 0">
+                <a href="{meeting_url}" style="background:#4f46e5;color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">Join Meeting</a>
+            </div>
+            <p style="font-size:12px;color:#718096;word-break:break-all">Or copy and paste this URL into your browser:<br>{meeting_url}</p>
+        </div>
+        <div style="background:#f7fafc;padding:16px;text-align:center;font-size:12px;color:#a0aec0;border-top:1px solid #e2e8f0">
+            Sent by MeetingActionAgent
+        </div>
+    </div>
+    """
+    
+    payload = {
+        "personalizations": [{"to": [{"email": to_email}]}],
+        "from": {
+            "email": Config.FROM_EMAIL,
+            "name": from_name
+        },
+        "subject": "🔗 Invitation to Join Virtual Meeting",
+        "content": [{"type": "text/html", "value": html}]
+    }
+
+    r = requests.post(
+        "https://api.sendgrid.com/v3/mail/send",
+        headers={
+            "Authorization": f"Bearer {Config.SENDGRID_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json=payload,
+        timeout=10
+    )
+
+    if r.status_code == 202:
+        logger.info(f"Meeting link shared with {to_email}")
+    else:
+        logger.error(f"Share link email error {r.status_code}: {r.text}")
+        raise Exception(f"SendGrid failed: {r.status_code}")
+
