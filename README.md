@@ -5,9 +5,9 @@
 
 ## 🎥 Demo
 
-> [Add your demo video link here after recording]
+> [**👉 Click Here to Watch the Demo Video on Google Drive**](https://drive.google.com/file/d/1AEIHTEnX4Joff6gn8uS802EWfbyGSmYK/view?usp=drive_link)
 
-![MeetingActionAgent UI](static/mic_icon.png)
+![MeetingActionAgent Banner](static/banner.png)
 
 ## 💡 What it does
 
