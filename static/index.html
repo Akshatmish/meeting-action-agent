@@ -985,6 +985,11 @@ Akshat: Perfect, thanks team. We also decided to migrate our staging servers to 
             formData.append('organizer_name', organizerName);
             formData.append('organizer_email', organizerEmail);
             
+            const meetingUrlEl = document.getElementById('meeting-url');
+            if (meetingUrlEl && meetingUrlEl.value.trim()) {
+                formData.append('meeting_url', meetingUrlEl.value.trim());
+            }
+            
             let hasInput = false;
 
             if (currentTab === 'record') {

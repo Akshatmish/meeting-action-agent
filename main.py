@@ -22,7 +22,7 @@ BANNER = """
 """
 
 
-def run(transcript: str, attendee_emails: list, organizer_name: str = None, organizer_email: str = None) -> dict:
+def run(transcript: str, attendee_emails: list, organizer_name: str = None, organizer_email: str = None, meeting_url: str = None) -> dict:
     print(BANNER)
 
     # Validate all keys first
@@ -97,7 +97,8 @@ def run(transcript: str, attendee_emails: list, organizer_name: str = None, orga
             action_items=action_items,
             decisions=decisions,
             organizer_name=organizer_name,
-            organizer_email=organizer_email
+            organizer_email=organizer_email,
+            meeting_url=meeting_url
         )
     else:
         logger.info("STEP 5: Skipping Email (SENDGRID_API_KEY not set)")

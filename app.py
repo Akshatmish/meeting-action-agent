@@ -100,7 +100,8 @@ async def process_meeting(
     file: Optional[UploadFile] = File(None),
     attendee_emails: Optional[str] = Form(None),
     organizer_name: Optional[str] = Form(None),
-    organizer_email: Optional[str] = Form(None)
+    organizer_email: Optional[str] = Form(None),
+    meeting_url: Optional[str] = Form(None)
 ):
     """
     Accepts text transcript or audio file, transcribes via Whisper (if audio), 
@@ -161,7 +162,8 @@ async def process_meeting(
             transcript=final_transcript, 
             attendee_emails=emails_list,
             organizer_name=organizer_name,
-            organizer_email=organizer_email
+            organizer_email=organizer_email,
+            meeting_url=meeting_url
         )
         return result
 
