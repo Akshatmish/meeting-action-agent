@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeetingActionAgent 🤖 | Agents League Hackathon</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <canvas id="interactive-bg"></canvas>
+    <div class="glow-bg">
+        <div class="orb-3"></div>
+    </div>
+    
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-icon">🤖</div>
+                <div>
+                    <h1>MeetingActionAgent</h1>
+                    <p class="subtitle">Azure AI Foundry + Microsoft Work IQ Orchestrator</p>
+                </div>
+            </div>
+            <div class="hackathon-tag">
+                <i class="fa-solid fa-trophy"></i> Agents League '26
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="dashboard-grid">
+            <div class="sidebar-col">
+                <!-- Sidebar / Control Panel -->
+                <div class="panel glass-card controls-sidebar">
+                    <h2><i class="fa-solid fa-gears"></i> Integrations Status</h2>
+                    <p class="panel-desc">Automatic detection of your credentials from <code>.env</code></p>
+                    
+                    <div class="status-list" id="status-list">
+                        <div class="status-item loading" id="status-azure">
+                            <i class="fa-solid fa-brain"></i>
+                            <span>Azure AI Foundry</span>
+                            <span class="badge">Checking...</span>
+                        </div>
+                        <div class="status-item loading" id="status-work-iq">
+                            <i class="fa-solid fa-address-book"></i>
+                            <span>Microsoft Work IQ</span>
+                            <span class="badge">Checking...</span>
+                        </div>
+                        <div class="status-item loading" id="status-notion">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>Notion Pages</span>
+                            <span class="badge">Checking...</span>
+                        </div>
+                        <div class="status-item loading" id="status-jira">
+                            <i class="fa-solid fa-ticket"></i>
+                            <span>Jira Software</span>
+                            <span class="badge">Checking...</span>
+                        </div>
+                        <div class="status-item loading" id="status-github">
+                            <i class="fa-brands fa-github"></i>
+                            <span>GitHub Issues</span>
+                            <span class="badge">Checking...</span>
+                        </div>
+                        <div class="status-item loading" id="status-sendgrid">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>SendGrid Email</span>
+                            <span class="badge">Checking...</span>
+                        </div>
+                    </div>
+
+                    <div class="separator"></div>
+
+                    <h2><i class="fa-solid fa-user-tie"></i> Meeting Organizer</h2>
+                    <div class="input-group">
+                        <label for="organizer-name">Organizer Name</label>
+                        <input type="text" id="organizer-name" placeholder="e.g. Akshat Mishra" value="Akshat Mishra">
+                    </div>
+                    <div class="input-group">
+                        <label for="organizer-email">Organizer Email</label>
+                        <input type="email" id="organizer-email" placeholder="e.g. akshat.mishra@bhumiitech.com" value="akshat.mishra@bhumiitech.com">
+                    </div>
+
+                    <div class="separator"></div>
+
+                    <h2><i class="fa-solid fa-users"></i> Participants</h2>
+                    <div class="input-group">
+                        <label for="attendee-emails">Email Recipients</label>
+                        <textarea id="attendee-emails" placeholder="e.g. akshat@company.com, priya@company.com" rows="2"></textarea>
+                        <span class="input-tip">SendGrid summary emails will be sent to these addresses.</span>
+                    </div>
+                </div>
+
+                <!-- API Settings Panel -->
+                <div class="panel glass-card settings-panel">
+                    <h2 id="settings-title-btn" class="settings-title" role="button" tabindex="0" aria-expanded="false">
+                        <span><i class="fa-solid fa-key"></i> API Credentials</span>
+                        <i class="fa-solid fa-chevron-down toggle-icon" id="settings-toggle-icon"></i>
+                    </h2>
+                    <div class="settings-content" id="settings-content" style="display: none;">
+                        <p class="panel-desc">Configure custom API keys. Saved locally in your browser storage.</p>
+                        
+                        <div class="input-group">
+                            <label for="conf-azure-key">Azure API Key</label>
+                            <input type="password" id="conf-azure-key" placeholder="Enter Azure API Key">
+                        </div>
+                        <div class="input-group">
+                            <label for="conf-azure-endpoint">Azure Endpoint</label>
+                            <input type="text" id="conf-azure-endpoint" placeholder="https://your-resource.openai.azure.com/">
+                        </div>
+                        
+                        <div class="settings-divider">GitHub & Notion</div>
+                        <div class="input-group">
+                            <label for="conf-github-pat">GitHub PAT</label>
+                            <input type="password" id="conf-github-pat" placeholder="ghp_...">
+                        </div>
+                        <div class="input-group">
+                            <label for="conf-github-repo">GitHub Repo</label>
+                            <input type="text" id="conf-github-repo" placeholder="Owner/Repo">
+                        </div>
+                        <div class="input-group">
+                            <label for="conf-notion-token">Notion Token</label>
+                            <input type="password" id="conf-notion-token" placeholder="ntn_...">
+                        </div>
+                        <div class="input-group">
+                            <label for="conf-notion-db">Notion Database ID</label>
+                            <input type="text" id="conf-notion-db" placeholder="Database ID">
+                        </div>
+
+                        <div class="settings-divider">SendGrid & Jira</div>
+                        <div class="input-group">
+                            <label for="conf-sendgrid-key">SendGrid API Key</label>
+                            <input type="password" id="conf-sendgrid-key" placeholder="SG....">
+                        </div>
+                        <div class="input-group">
+                            <label for="conf-from-email">From Email</label>
+                            <input type="text" id="conf-from-email" placeholder="sender@email.com">
+                        </div>
+                        <div class="input-group">
+                            <label for="conf-jira-token">Jira API Token</label>
+                            <input type="password" id="conf-jira-token" placeholder="Jira Token">
+                        </div>
+                        <div class="input-group">
+                            <label for="conf-jira-url">Jira URL</label>
+                            <input type="text" id="conf-jira-url" placeholder="https://domain.atlassian.net">
+                        </div>
+                        <div class="input-group">
+                            <label for="conf-jira-email">Jira Email</label>
+                            <input type="text" id="conf-jira-email" placeholder="jira@email.com">
+                        </div>
+                        <div class="input-group">
+                            <label for="conf-jira-proj">Jira Project Key</label>
+                            <input type="text" id="conf-jira-proj" placeholder="PROJ">
+                        </div>
+                        
+                        <button type="button" class="btn btn-primary btn-save-config" id="save-config-btn"><i class="fa-solid fa-floppy-disk"></i> Save & Sync Keys</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workspace Panel -->
+            <div class="panel glass-card workspace-panel">
+                <div class="tabs-header">
+                    <button type="button" class="tab-btn active" id="tab-btn-record"><i class="fa-solid fa-microphone"></i> Record Meeting</button>
+                    <button type="button" class="tab-btn" id="tab-btn-upload"><i class="fa-solid fa-file-arrow-up"></i> Upload Audio</button>
+                    <button type="button" class="tab-btn" id="tab-btn-text"><i class="fa-solid fa-file-lines"></i> Paste Transcript</button>
+                    <button type="button" class="tab-btn" id="tab-btn-import"><i class="fa-solid fa-file-import"></i> Import / Link Meet</button>
+                </div>
+
+                <!-- Tab Content: Record Audio -->
+                <div class="tab-content active" id="tab-record">
+                    <div class="recorder-container">
+                        <p class="tab-desc">Record your meeting audio directly from your microphone or output audio</p>
+                        
+                        <div class="mic-button-wrapper">
+                            <button type="button" id="record-btn" class="record-btn">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+                            <div class="waves-container" id="waves">
+                                <div class="wave"></div>
+                                <div class="wave"></div>
+                                <div class="wave"></div>
+                                <div class="wave"></div>
+                                <div class="wave"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="recording-status" id="record-status">Click to start recording</div>
+                        
+                        <!-- Auto-Pilot Mode Panel -->
+                        <div class="autopilot-panel">
+                            <div class="autopilot-header">
+                                <div class="autopilot-title">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    <span>Autonomous Auto-Pilot Mode</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="autopilot-toggle">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <p class="autopilot-summary-desc">Hands-free voice detection. Automatically starts recording when speech starts, and finishes the meeting after 8 seconds of silence.</p>
+                            <div class="autopilot-body" id="autopilot-body">
+                                <p class="autopilot-desc">Hands-free mode. Automatically starts recording when speaking begins, and automatically processes the meeting after 8 seconds of silence.</p>
+                                <div class="audio-level-container">
+                                    <span class="visualizer-label">Mic Activity Level:</span>
+                                    <div class="level-bar-bg">
+                                        <div class="level-bar-fill" id="level-fill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                                <div class="autopilot-state">
+                                    <span class="autopilot-indicator" id="autopilot-indicator"><i class="fa-solid fa-ear-listen"></i> Disabled</span>
+                                    <span class="silence-countdown" id="silence-countdown"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="audio-preview-container" id="audio-preview-area" style="display: none;">
+                            <h3><i class="fa-solid fa-circle-play"></i> Recording Preview</h3>
+                            <audio id="audio-playback" controls></audio>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Upload Audio -->
+                <div class="tab-content" id="tab-upload">
+                    <p class="tab-desc">Upload a recorded meeting audio file (.mp3, .wav, .m4a)</p>
+                    <div class="upload-zone" id="drop-zone">
+                        <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                        <p>Drag and drop your audio file here or <span>browse files</span></p>
+                        <input type="file" id="audio-file" accept="audio/*" style="display: none;">
+                    </div>
+                    <div class="file-info-card" id="file-info" style="display: none;">
+                        <i class="fa-solid fa-file-audio"></i>
+                        <div class="file-meta">
+                            <span class="file-name" id="selected-file-name">filename.mp3</span>
+                            <span class="file-size" id="selected-file-size">1.2 MB</span>
+                        </div>
+                        <button type="button" class="btn-clear" id="clear-file-btn" aria-label="Remove file"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Paste Transcript -->
+                <div class="tab-content" id="tab-text">
+                    <div class="transcript-paster-header">
+                        <p class="tab-desc">Paste a raw meeting transcript to analyze instantly</p>
+                        <button type="button" class="btn btn-secondary btn-sm" id="load-sample-btn">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Load Sample Transcript
+                        </button>
+                    </div>
+                    <div class="input-group">
+                        <textarea id="raw-transcript" placeholder="Paste dialogue transcript here...&#10;e.g.&#10;Akshat: Let's fix the login bug.&#10;Priya: I will take that task..." rows="12"></textarea>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Import / Link Meet -->
+                <div class="tab-content" id="tab-import">
+                    <p class="tab-desc" style="line-height: 1.6;">
+                        <strong>What it is:</strong> Load transcripts from past meetings or virtual platforms to automatically extract and sync action items.<br>
+                        <strong>What it imports:</strong> You can either drop a transcript file (supporting formats like <strong>.vtt, .srt, .txt, .json</strong>) or enter a live meeting invitation URL (Google Meet, Zoom, Teams) to simulated-connect and transcribe spoken meeting dialogue in real-time.
+                    </p>
+                    
+                    <div class="import-grid">
+                        <div class="import-section file-import-zone">
+                            <h3><i class="fa-solid fa-file-code"></i> Drop Transcript File</h3>
+                            <div class="upload-zone" id="transcript-drop-zone">
+                                <i class="fa-solid fa-file-import upload-icon"></i>
+                                <p>Drag & drop <b>.vtt, .srt, .txt, .json</b> transcript here or <span>browse files</span></p>
+                                <input type="file" id="transcript-file" accept=".vtt,.srt,.txt,.json" style="display: none;">
+                            </div>
+                            <div class="file-info-card" id="transcript-file-info" style="display: none;">
+                                <i class="fa-solid fa-file-circle-check"></i>
+                                <div class="file-meta">
+                                    <span class="file-name" id="selected-trans-name">filename.vtt</span>
+                                    <span class="file-size" id="selected-trans-size">12 KB</span>
+                                </div>
+                                <button type="button" class="btn-clear" id="clear-transcript-btn" aria-label="Remove transcript"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="import-section link-import-zone">
+                            <h3><i class="fa-solid fa-video"></i> Connect Live Meeting</h3>
+                            <p class="section-desc">Connect autonomously to active Google Meet, Microsoft Teams, or Zoom session.</p>
+                            
+                            <div class="input-group">
+                                <label for="meeting-url">Meeting Invitation URL</label>
+                                <div class="input-with-button">
+                                    <input type="text" id="meeting-url" placeholder="https://meet.google.com/abc-defg-hij">
+                                    <button type="button" class="btn btn-secondary btn-sm" id="detect-meet-btn"><i class="fa-solid fa-satellite-dish"></i> Connect</button>
+                                </div>
+                            </div>
+                            
+                            <div class="live-connection-status" id="live-connection-card" style="display: none;">
+                                <div class="status-header">
+                                    <span class="pulse-indicator"></span>
+                                    <span class="status-label">Active Connection: <strong id="detected-platform">Google Meet</strong></span>
+                                </div>
+                                <p class="status-details">Listening to system audio and transcribing in real-time...</p>
+                                <div class="transcription-stream-box" id="transcription-stream-box">
+                                    <p class="stream-line system-msg">[System: Connection established. Waiting for speech...]</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="action-bar">
+                    <button type="button" class="btn btn-primary btn-large" id="process-btn">
+                        <i class="fa-solid fa-bolt-lightning"></i> Process Meeting & Sync Tasks
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Loader & Stepper (Visible during API call) -->
+        <div class="panel glass-card processing-panel" id="processing-stepper" style="display: none;">
+            <h2><i class="fa-solid fa-arrows-spin fa-spin"></i> Execution Progress</h2>
+            <p class="stepper-subtitle">Orchestrator pipeline actively processing requests</p>
+            
+            <div class="stepper">
+                <div class="step" id="step-transcribe">
+                    <div class="step-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+                    <div class="step-details">
+                        <h3>Transcribing Audio</h3>
+                        <p>Converting voice signals into text transcript...</p>
+                    </div>
+                </div>
+                <div class="step" id="step-analyze">
+                    <div class="step-icon"><i class="fa-solid fa-robot"></i></div>
+                    <div class="step-details">
+                        <h3>AI Transcript Analysis</h3>
+                        <p>Extracting action items, summaries, and decisions with Azure OpenAI...</p>
+                    </div>
+                </div>
+                <div class="step" id="step-notion">
+                    <div class="step-icon"><i class="fa-solid fa-book-open"></i></div>
+                    <div class="step-details">
+                        <h3>Syncing Notion Tasks</h3>
+                        <p>Creating task cards and meeting summary page in Notion database...</p>
+                    </div>
+                </div>
+                <div class="step" id="step-jira">
+                    <div class="step-icon"><i class="fa-solid fa-ticket"></i></div>
+                    <div class="step-details">
+                        <h3>Creating Jira Tickets</h3>
+                        <p>Publishing issues to your selected Jira Software project board...</p>
+                    </div>
+                </div>
+                <div class="step" id="step-github">
+                    <div class="step-icon"><i class="fa-brands fa-github"></i></div>
+                    <div class="step-details">
+                        <h3>Logging GitHub Issues</h3>
+                        <p>Logging technical issues in your GitHub repository...</p>
+                    </div>
+                </div>
+                <div class="step" id="step-email">
+                    <div class="step-icon"><i class="fa-solid fa-envelope"></i></div>
+                    <div class="step-details">
+                        <h3>Dispatching Email Summaries</h3>
+                        <p>Sending formatted HTML action report via SendGrid...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Viewer -->
+        <div class="panel glass-card results-panel" id="results-view" style="display: none;">
+            <div class="results-header">
+                <h2><i class="fa-solid fa-square-poll-vertical"></i> Meeting Processing Results</h2>
+                <button type="button" class="btn btn-secondary btn-sm" id="reset-app-btn"><i class="fa-solid fa-arrow-left"></i> Run Another</button>
+            </div>
+
+            <!-- Dashboard Summary Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="num" id="metric-tasks">0</span>
+                    <span class="label">Action Items Extracted</span>
+                </div>
+                <div class="metric-card">
+                    <span class="num" id="metric-notion">0</span>
+                    <span class="label">Notion Pages Synced</span>
+                </div>
+                <div class="metric-card">
+                    <span class="num" id="metric-jira">0</span>
+                    <span class="label">Jira Tickets Created</span>
+                </div>
+                <div class="metric-card">
+                    <span class="num" id="metric-emails">0</span>
+                    <span class="label">Emails Dispatched</span>
+                </div>
+            </div>
+
+            <div class="results-tabs">
+                <button type="button" class="res-tab-btn active" id="res-tab-btn-summary"><i class="fa-solid fa-chart-pie"></i> Executive Summary</button>
+                <button type="button" class="res-tab-btn" id="res-tab-btn-tasks"><i class="fa-solid fa-list-check"></i> Action Items</button>
+                <button type="button" class="res-tab-btn" id="res-tab-btn-links"><i class="fa-solid fa-link"></i> Synced Integrations</button>
+            </div>
+
+            <!-- Result Tab: Summary -->
+            <div class="res-tab-content active" id="res-summary">
+                <div class="summary-section">
+                    <h3>Meeting Summary</h3>
+                    <p class="summary-text" id="res-summary-paragraph">Summary will appear here...</p>
+                </div>
+                <div class="separator"></div>
+                <div class="summary-section">
+                    <h3>Key Decisions</h3>
+                    <ul class="decisions-list" id="res-decisions-list">
+                        <li>Decisions will appear here...</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Result Tab: Tasks -->
+            <div class="res-tab-content" id="res-tasks">
+                <div class="tasks-table-container">
+                    <table class="tasks-table">
+                        <thead>
+                            <tr>
+                                <th>Task Description</th>
+                                <th>Assignee</th>
+                                <th>Deadline</th>
+                                <th>Priority</th>
+                                <th>Category</th>
+                            </tr>
+                        </thead>
+                        <tbody id="res-tasks-tbody">
+                            <!-- Tasks will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Result Tab: Links -->
+            <div class="res-tab-content" id="res-links">
+                <div class="links-list" id="res-links-list">
+                    <!-- Links will be injected here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- App Footer -->
+        <footer class="app-footer">
+            <p>Meeting Action Agent</p>
+        </footer>
+    </div>
+
+    <!-- Scripting Logic -->
+    <script>
+        let currentTab = 'record';
+        let currentResultTab = 'res-summary';
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordedBlob = null;
+        let selectedFile = null;
+        let importedTranscriptText = "";
+        let liveMeetingTranscriptText = "";
+        let liveMeetingInterval = null;
+
+        // Initialize status on load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkStatus();
+            setupDragAndDrop();
+            setupTranscriptDragAndDrop();
+            initInteractiveBackground();
+            setupGlobalClickAnimation();
+            initLocalConfig();
+            wireEventListeners();
+        });
+
+        // Wire all event listeners (replaces all inline onclick/onchange)
+        function wireEventListeners() {
+            // Settings panel toggle
+            const settingsBtn = document.getElementById('settings-title-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', toggleSettings);
+                settingsBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSettings(); } });
+            }
+
+            // Save credentials button
+            const saveBtn = document.getElementById('save-config-btn');
+            if (saveBtn) saveBtn.addEventListener('click', saveCredentials);
+
+            // Tab buttons
+            const tabMap = { 'tab-btn-record': 'record', 'tab-btn-upload': 'upload', 'tab-btn-text': 'text', 'tab-btn-import': 'import' };
+            Object.entries(tabMap).forEach(([btnId, tabId]) => {
+                const btn = document.getElementById(btnId);
+                if (btn) btn.addEventListener('click', (e) => switchTab(tabId, e));
+            });
+
+            // Result tab buttons
+            const resTabMap = { 'res-tab-btn-summary': 'res-summary', 'res-tab-btn-tasks': 'res-tasks', 'res-tab-btn-links': 'res-links' };
+            Object.entries(resTabMap).forEach(([btnId, tabId]) => {
+                const btn = document.getElementById(btnId);
+                if (btn) btn.addEventListener('click', () => switchResultTab(tabId));
+            });
+
+            // Autopilot toggle
+            const autopilotToggle = document.getElementById('autopilot-toggle');
+            if (autopilotToggle) autopilotToggle.addEventListener('change', toggleAutopilot);
+
+            // Clear file buttons
+            const clearFileBtn = document.getElementById('clear-file-btn');
+            if (clearFileBtn) clearFileBtn.addEventListener('click', clearFile);
+
+            const clearTranscriptBtn = document.getElementById('clear-transcript-btn');
+            if (clearTranscriptBtn) clearTranscriptBtn.addEventListener('click', clearTranscriptFile);
+
+            // Load sample transcript
+            const loadSampleBtn = document.getElementById('load-sample-btn');
+            if (loadSampleBtn) loadSampleBtn.addEventListener('click', loadSampleTranscript);
+
+            // Connect live meeting
+            const detectMeetBtn = document.getElementById('detect-meet-btn');
+            if (detectMeetBtn) detectMeetBtn.addEventListener('click', connectLiveMeeting);
+
+            // Process meeting
+            const processBtn = document.getElementById('process-btn');
+            if (processBtn) processBtn.addEventListener('click', startProcessing);
+
+            // Reset app
+            const resetBtn = document.getElementById('reset-app-btn');
+            if (resetBtn) resetBtn.addEventListener('click', resetApp);
+        }
+
+        // Setup global bouncing animations on click
+        function setupGlobalClickAnimation() {
+            document.addEventListener('click', (e) => {
+                const el = e.target.closest('.tab-btn, .res-tab-btn, .btn, .record-btn');
+                if (el) {
+                    el.classList.add('jump-anim');
+                    el.addEventListener('animationend', () => {
+                        el.classList.remove('jump-anim');
+                    }, { once: true });
+                }
+            });
+        }
+
+        // Canvas Particle Network Background Animation
+        function initInteractiveBackground() {
+            const canvas = document.getElementById('interactive-bg');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const particleCount = 28;
+            const maxDistance = 110;
+            
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+            
+            const particleColors = [
+                'rgba(129, 140, 248, 0.5)',  // Bright Indigo (visible on dark)
+                'rgba(167, 139, 250, 0.5)',  // Bright Violet
+                'rgba(236, 72, 153, 0.4)'    // Bright Pink
+            ];
+            
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 0.16; // Extremely slow float
+                    this.vy = (Math.random() - 0.5) * 0.16;
+                    this.radius = Math.random() * 2 + 1;    // Small subtle particles
+                    this.color = particleColors[Math.floor(Math.random() * particleColors.length)];
+                }
+                
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    
+                    if (this.x < 0 || this.x > width) this.vx *= -1;
+                    if (this.y < 0 || this.y > height) this.vy *= -1;
+                }
+                
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+            }
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                
+                // Draw lines
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                    
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        
+                        if (dist < maxDistance) {
+                            const alpha = (1 - (dist / maxDistance)) * 0.14; // Soft lines
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(99, 102, 241, ${alpha})`;
+                            ctx.lineWidth = 1.0;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+
+        // Drag & drop for transcript files
+        function setupTranscriptDragAndDrop() {
+            const transDropZone = document.getElementById('transcript-drop-zone');
+            const transFileInput = document.getElementById('transcript-file');
+            
+            if (!transDropZone) return;
+            
+            transDropZone.addEventListener('click', () => transFileInput.click());
+            
+            transFileInput.addEventListener('change', (e) => {
+                if (transFileInput.files.length > 0) {
+                    handleTranscriptFileSelect(transFileInput.files[0]);
+                }
+            });
+
+            transDropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                transDropZone.classList.add('dragover');
+            });
+
+            transDropZone.addEventListener('dragleave', () => {
+                transDropZone.classList.remove('dragover');
+            });
+
+            transDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                transDropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleTranscriptFileSelect(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
+        function handleTranscriptFileSelect(file) {
+            const selectedTransName = document.getElementById('selected-trans-name');
+            const selectedTransSize = document.getElementById('selected-trans-size');
+            const transFileInfo = document.getElementById('transcript-file-info');
+            
+            selectedTransName.innerText = file.name;
+            const sizeKB = (file.size / 1024).toFixed(1);
+            selectedTransSize.innerText = `${sizeKB} KB`;
+            transFileInfo.style.display = 'flex';
+            
+            // Read file content
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const content = event.target.result;
+                const ext = file.name.split('.').pop().toLowerCase();
+                importedTranscriptText = parseTranscriptFile(content, ext);
+                console.log("Parsed transcript content size: ", importedTranscriptText.length);
+            };
+            reader.readAsText(file);
+        }
+
+        function clearTranscriptFile() {
+            importedTranscriptText = "";
+            document.getElementById('transcript-file').value = '';
+            document.getElementById('transcript-file-info').style.display = 'none';
+        }
+
+        function parseTranscriptFile(content, fileExtension) {
+            if (fileExtension === 'json') {
+                try {
+                    const data = JSON.parse(content);
+                    if (data.transcript) return data.transcript;
+                    if (Array.isArray(data)) {
+                        return data.map(item => `${item.speaker || item.user || 'Unknown'}: ${item.text}`).join('\n');
+                    }
+                } catch (e) {
+                    console.error("Failed to parse JSON transcript:", e);
+                }
+            }
+            
+            // WebVTT / SRT clean up
+            let cleanText = content;
+            cleanText = cleanText.replace(/^WEBVTT\s*/i, '');
+            cleanText = cleanText.replace(/\d{2}:\d{2}:\d{2}[.,]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[.,]\d{3}/g, '');
+            cleanText = cleanText.replace(/\d{2}:\d{2}[.,]\d{3}\s*-->\s*\d{2}:\d{2}[.,]\d{3}/g, '');
+            cleanText = cleanText.replace(/\d{2}:\d{2}\s*-->\s*\d{2}:\d{2}/g, '');
+            cleanText = cleanText.replace(/^\d+$/gm, '');
+            
+            let lines = cleanText.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+                
+            return lines.join('\n');
+        }
+
+        // Live connection connect logic
+        function connectLiveMeeting() {
+            const url = document.getElementById('meeting-url').value.trim();
+            const detectBtn = document.getElementById('detect-meet-btn');
+            const card = document.getElementById('live-connection-card');
+            const platformLabel = document.getElementById('detected-platform');
+            const streamBox = document.getElementById('transcription-stream-box');
+            
+            card.style.display = 'block';
+            streamBox.innerHTML = '<p class="stream-line system-msg">[System: Connection established. Initializing voice extraction...]</p>';
+            liveMeetingTranscriptText = "";
+            
+            if (liveMeetingInterval) {
+                clearInterval(liveMeetingInterval);
+            }
+            
+            let platform = "Google Meet";
+            if (url.toLowerCase().includes("teams")) {
+                platform = "Microsoft Teams";
+            } else if (url.toLowerCase().includes("zoom")) {
+                platform = "Zoom";
+            }
+            platformLabel.innerText = platform;
+            
+            const dialogueLines = [
+                { speaker: "Akshat", text: "Hi everyone, let's get started with our meeting action plan review." },
+                { speaker: "Priya", text: "Sure Akshat, we have a few tasks that need clear ownership today." },
+                { speaker: "Rahul", text: "I finished the preliminary testing of the authentication controller, but we have some integration tasks." },
+                { speaker: "Akshat", text: "Yes, Rahul, can you check on the Jira API token configuration issue and deploy a fix by Friday?" },
+                { speaker: "Rahul", text: "Yes, I will pick up the Jira API token fix and test it locally first. Should be done before Friday." },
+                { speaker: "Priya", text: "And I can take the UI redesign to make it look premium with custom background animations and bouncing tabs." },
+                { speaker: "Akshat", text: "Perfect, Priya! Make sure to write a detailed walkthrough explaining the changes as well." },
+                { speaker: "Priya", text: "Absolutely, I will document everything in walkthrough.md and finalize the styles." },
+                { speaker: "Akshat", text: "Excellent. Let's make sure the emails are sent out to all attendees using SendGrid once the tasks are synchronized." }
+            ];
+            
+            let lineIdx = 0;
+            
+            liveMeetingInterval = setInterval(() => {
+                if (lineIdx < dialogueLines.length) {
+                    const line = dialogueLines[lineIdx];
+                    const msg = `${line.speaker}: ${line.text}`;
+                    
+                    const p = document.createElement('p');
+                    p.className = 'stream-line';
+                    p.innerHTML = `<strong>${line.speaker}:</strong> ${line.text}`;
+                    streamBox.appendChild(p);
+                    streamBox.scrollTop = streamBox.scrollHeight;
+                    
+                    liveMeetingTranscriptText += (liveMeetingTranscriptText ? '\n' : '') + msg;
+                    lineIdx++;
+                } else {
+                    const p = document.createElement('p');
+                    p.className = 'stream-line system-msg';
+                    p.innerText = '[System: Meeting finished. Press "Process Meeting & Sync Tasks" below to analyze.]';
+                    streamBox.appendChild(p);
+                    streamBox.scrollTop = streamBox.scrollHeight;
+                    clearInterval(liveMeetingInterval);
+                    liveMeetingInterval = null;
+                }
+            }, 3000);
+        }
+
+        // Check APIs config status
+        function checkStatus() {
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(data => {
+                    updateStatusIndicator('status-azure', data.azure);
+                    updateStatusIndicator('status-work-iq', data.work_iq, true); // Work IQ has fallback
+                    updateStatusIndicator('status-notion', data.notion);
+                    updateStatusIndicator('status-jira', data.jira);
+                    updateStatusIndicator('status-github', data.github);
+                    updateStatusIndicator('status-sendgrid', data.sendgrid);
+                })
+                .catch(err => {
+                    console.error("Failed to fetch integration status:", err);
+                });
+        }
+
+        function updateStatusIndicator(elementId, isConfigured, hasFallback = false) {
+            const el = document.getElementById(elementId);
+            el.className = 'status-item ' + (isConfigured ? 'success' : (hasFallback ? 'warning' : 'danger'));
+            const badge = el.querySelector('.badge');
+            if (isConfigured) {
+                badge.className = 'badge badge-success';
+                badge.innerText = 'Connected';
+            } else if (hasFallback) {
+                badge.className = 'badge badge-warning';
+                badge.innerText = 'Fallback';
+            } else {
+                badge.className = 'badge badge-danger';
+                badge.innerText = 'Not Configured';
+            }
+        }
+
+        // Tab Management
+        function switchTab(tabId, event) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            const btnEl = document.getElementById(`tab-btn-${tabId}`);
+            if (btnEl) btnEl.classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+        }
+
+        function switchResultTab(tabId) {
+            currentResultTab = tabId;
+            document.querySelectorAll('.res-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.res-tab-content').forEach(content => content.classList.remove('active'));
+            
+            const resTabIdMap = { 'res-summary': 'res-tab-btn-summary', 'res-tasks': 'res-tab-btn-tasks', 'res-links': 'res-tab-btn-links' };
+            const btnEl = document.getElementById(resTabIdMap[tabId]);
+            if (btnEl) btnEl.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Recording Logic
+        const recordBtn = document.getElementById('record-btn');
+        const recordStatus = document.getElementById('record-status');
+        const waves = document.getElementById('waves');
+        const playback = document.getElementById('audio-playback');
+        const previewArea = document.getElementById('audio-preview-area');
+
+        recordBtn.addEventListener('click', async () => {
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    audioChunks = [];
+                    mediaRecorder = new MediaRecorder(stream);
+                    
+                    mediaRecorder.addEventListener('dataavailable', event => {
+                        audioChunks.push(event.data);
+                    });
+
+                    mediaRecorder.addEventListener('stop', () => {
+                        recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioUrl = URL.createObjectURL(recordedBlob);
+                        playback.src = audioUrl;
+                        previewArea.style.display = 'block';
+                        recordStatus.innerText = 'Recording saved! Click to record again.';
+                    });
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordBtn.classList.add('recording');
+                    waves.classList.add('active');
+                    recordStatus.innerText = 'Recording... click button to stop';
+                } catch (err) {
+                    alert('Could not access microphone: ' + err.message);
+                }
+            } else {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                recordBtn.classList.remove('recording');
+                waves.classList.remove('active');
+            }
+        });
+
+        // Drag & Drop
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('audio-file');
+        const fileInfo = document.getElementById('file-info');
+        const selectedFileName = document.getElementById('selected-file-name');
+        const selectedFileSize = document.getElementById('selected-file-size');
+
+        function setupDragAndDrop() {
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            fileInput.addEventListener('change', (e) => {
+                if (fileInput.files.length > 0) {
+                    handleFileSelect(fileInput.files[0]);
+                }
+            });
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleFileSelect(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
+        function handleFileSelect(file) {
+            selectedFile = file;
+            selectedFileName.innerText = file.name;
+            
+            // Format size
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            selectedFileSize.innerText = `${sizeMB} MB`;
+            
+            fileInfo.style.display = 'flex';
+        }
+
+        function clearFile() {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+        }
+
+        // Sample transcript
+        function loadSampleTranscript() {
+            document.getElementById('raw-transcript').value = `Meeting: Sprint Retrospective and Task Review
+Date: June 12, 2026
+Attendees: Akshat, Priya, Rahul
+
+Akshat: Thanks for joining. We have three main action items from today's discussion. First, Priya, we need to create the main landing page documentation in Notion. Can you wrap that up by Friday EOD?
+Priya: Sure, I will build out the Notion summary and configure the table parameters by Friday.
+Rahul: I found a critical bug in the authentication controller. The JWT token expires too fast. I can submit a hotfix for this by tomorrow afternoon.
+Akshat: Excellent. Let's make sure that's logged as a high priority bug in Jira so we don't release it as is.
+Rahul: Will do. I'll create the Jira task.
+Akshat: Lastly, Priya, we also need to build the SendGrid email notification client. Let's set a deadline for next Wednesday.
+Priya: Got it. I'll write the SendGrid integration code and test it next week.
+Akshat: Perfect, thanks team. We also decided to migrate our staging servers to AWS next month. Let's make sure we document this decision.`;
+        }        // Reset App
+        function resetApp() {
+            document.getElementById('results-view').style.display = 'none';
+            document.getElementById('processing-stepper').style.display = 'none';
+            document.querySelector('.dashboard-grid').style.display = 'grid';
+            
+            // Clear inputs
+            document.getElementById('raw-transcript').value = '';
+            clearFile();
+            clearTranscriptFile();
+            
+            if (liveMeetingInterval) {
+                clearInterval(liveMeetingInterval);
+                liveMeetingInterval = null;
+            }
+            liveMeetingTranscriptText = "";
+            const liveCard = document.getElementById('live-connection-card');
+            if (liveCard) liveCard.style.display = 'none';
+            document.getElementById('meeting-url').value = '';
+            
+            recordedBlob = null;
+            previewArea.style.display = 'none';
+            playback.src = '';
+            recordStatus.innerText = 'Click to start recording';
+            
+            // Reset stepper styles
+            document.querySelectorAll('.step').forEach(step => {
+                step.className = 'step';
+            });
+        }
+
+        // Processing Pipeline
+        function startProcessing() {
+            const processBtn = document.getElementById('process-btn');
+            const stepper = document.getElementById('processing-stepper');
+            const attendeeEmails = document.getElementById('attendee-emails').value;
+            const organizerName = document.getElementById('organizer-name').value;
+            const organizerEmail = document.getElementById('organizer-email').value;
+            
+            // Form Data
+            const formData = new FormData();
+            formData.append('attendee_emails', attendeeEmails);
+            formData.append('organizer_name', organizerName);
+            formData.append('organizer_email', organizerEmail);
+            
+            let hasInput = false;
+
+            if (currentTab === 'record') {
+                if (!recordedBlob) {
+                    alert('Please record audio first.');
+                    return;
+                }
+                formData.append('file', recordedBlob, 'recording.wav');
+                hasInput = true;
+            } else if (currentTab === 'upload') {
+                if (!selectedFile) {
+                    alert('Please upload an audio file first.');
+                    return;
+                }
+                formData.append('file', selectedFile);
+                hasInput = true;
+            } else if (currentTab === 'text') {
+                const text = document.getElementById('raw-transcript').value;
+                if (!text.trim()) {
+                    alert('Please enter a transcript.');
+                    return;
+                }
+                formData.append('transcript', text);
+                hasInput = true;
+            } else if (currentTab === 'import') {
+                let text = "";
+                if (importedTranscriptText) {
+                    text = importedTranscriptText;
+                } else if (liveMeetingTranscriptText) {
+                    text = liveMeetingTranscriptText;
+                } else {
+                    alert('Please connect to a live meeting or drop a transcript file.');
+                    return;
+                }
+                formData.append('transcript', text);
+                hasInput = true;
+            }
+
+            if (!hasInput) return;
+
+            // Hide grid, show stepper
+            document.querySelector('.dashboard-grid').style.display = 'none';
+            stepper.style.display = 'block';
+
+            // Reset Steps
+            setStepStatus('step-transcribe', (currentTab !== 'text' && currentTab !== 'import') ? 'running' : 'skipped');
+            setStepStatus('step-analyze', 'pending');
+            setStepStatus('step-notion', 'pending');
+            setStepStatus('step-jira', 'pending');
+            setStepStatus('step-github', 'pending');
+            setStepStatus('step-email', 'pending');
+
+            fetch('/api/process', {
+                method: 'POST',
+                body: formData
+            })
+            .then(async response => {
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Server returned an error');
+                }
+                return data;
+            })
+            .then(result => {
+                // Audio Transcription complete
+                if (currentTab !== 'text' && currentTab !== 'import') {
+                    setStepStatus('step-transcribe', 'success');
+                }
+                
+                // Trigger transition animation step-by-step
+                setTimeout(() => {
+                    setStepStatus('step-analyze', 'success');
+                    
+                    setTimeout(() => {
+                        // Notion check
+                        const hasNotion = result.notion_pages && result.notion_pages.length > 0;
+                        setStepStatus('step-notion', hasNotion ? 'success' : 'skipped');
+                        
+                        setTimeout(() => {
+                            // Jira check
+                            const hasJira = result.jira_tickets && result.jira_tickets.length > 0;
+                            setStepStatus('step-jira', hasJira ? 'success' : 'skipped');
+                            
+                            setTimeout(() => {
+                                // GitHub check
+                                const hasGitHub = result.github_issues && result.github_issues.length > 0;
+                                setStepStatus('step-github', hasGitHub ? 'success' : 'skipped');
+                                
+                                setTimeout(() => {
+                                    // Email check
+                                    const hasEmail = result.emails_sent && result.emails_sent.length > 0;
+                                    setStepStatus('step-email', hasEmail ? 'success' : 'skipped');
+                                    
+                                    // Finally, display results!
+                                    setTimeout(() => {
+                                        showResults(result);
+                                    }, 800);
+                                }, 600);
+                            }, 600);
+                        }, 600);
+                    }, 600);
+                }, 800);
+            })
+            .catch(err => {
+                alert(`Error processing meeting: ${err.message}`);
+                resetApp();
+            });
+        }
+
+        function setStepStatus(stepId, status) {
+            const step = document.getElementById(stepId);
+            step.className = `step ${status}`;
+            const sub = step.querySelector('p');
+            
+            if (status === 'running') {
+                sub.innerHTML = '<span class="status-running"><i class="fa-solid fa-spinner fa-spin"></i> Processing...</span>';
+            } else if (status === 'success') {
+                sub.innerHTML = '<span class="status-success"><i class="fa-solid fa-check"></i> Finished successfully</span>';
+            } else if (status === 'skipped') {
+                sub.innerHTML = '<span class="status-skipped"><i class="fa-solid fa-ban"></i> Skipped (Not configured / needed)</span>';
+            } else if (status === 'failed') {
+                sub.innerHTML = '<span class="status-failed"><i class="fa-solid fa-triangle-exclamation"></i> Action failed</span>';
+            }
+        }
+
+        // Display results
+        function showResults(result) {
+            document.getElementById('processing-stepper').style.display = 'none';
+            document.getElementById('results-view').style.display = 'block';
+
+            // Metrics
+            document.getElementById('metric-tasks').innerText = result.action_items.length;
+            document.getElementById('metric-notion').innerText = result.notion_pages ? result.notion_pages.length : 0;
+            document.getElementById('metric-jira').innerText = result.jira_tickets ? result.jira_tickets.length : 0;
+            document.getElementById('metric-emails').innerText = result.emails_sent ? result.emails_sent.length : 0;
+
+            // Summary Text
+            document.getElementById('res-summary-paragraph').innerText = result.summary;
+
+            // Decisions
+            const decisionsList = document.getElementById('res-decisions-list');
+            decisionsList.innerHTML = '';
+            if (result.decisions && result.decisions.length > 0) {
+                result.decisions.forEach(d => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${d}`;
+                    decisionsList.appendChild(li);
+                });
+            } else {
+                decisionsList.innerHTML = '<li class="no-decisions">No formal decisions recorded in this session.</li>';
+            }
+
+            // Tasks Table
+            const tbody = document.getElementById('res-tasks-tbody');
+            tbody.innerHTML = '';
+            if (result.action_items && result.action_items.length > 0) {
+                result.action_items.forEach(item => {
+                    const tr = document.createElement('tr');
+                    
+                    const priorityClass = `badge-${item.priority.toLowerCase()}`;
+                    const categoryClass = `category-${item.category.toLowerCase()}`;
+
+                    tr.innerHTML = `
+                        <td class="task-desc-cell">
+                            <strong>${item.task}</strong>
+                        </td>
+                        <td>
+                            <div class="assignee-meta">
+                                <span class="name">${item.owner}</span>
+                                <span class="email">${item.owner_email || 'No email'}</span>
+                            </div>
+                        </td>
+                        <td><span class="deadline-text"><i class="fa-regular fa-calendar"></i> ${item.deadline}</span></td>
+                        <td><span class="badge ${priorityClass}">${item.priority.toUpperCase()}</span></td>
+                        <td><span class="badge badge-secondary">${item.category.toUpperCase()}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-table">No action items found in the transcript.</td></tr>';
+            }
+
+            // Integration Links
+            const linksList = document.getElementById('res-links-list');
+            linksList.innerHTML = '';
+            
+            let hasLinks = false;
+
+            // Notion Links
+            if (result.notion_pages && result.notion_pages.length > 0) {
+                hasLinks = true;
+                result.notion_pages.forEach(url => {
+                    const card = document.createElement('a');
+                    card.href = url;
+                    card.target = '_blank';
+                    card.className = 'link-card link-notion';
+                    card.innerHTML = `
+                        <div class="link-logo"><i class="fa-solid fa-book-open"></i></div>
+                        <div class="link-meta">
+                            <h4>Notion Workspace Page</h4>
+                            <p>${url.slice(0, 70)}...</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square open-icon"></i>
+                    `;
+                    linksList.appendChild(card);
+                });
+            }
+
+            // Jira Links
+            if (result.jira_tickets && result.jira_tickets.length > 0) {
+                hasLinks = true;
+                result.jira_tickets.forEach(ticket => {
+                    const card = document.createElement('a');
+                    card.href = ticket.url;
+                    card.target = '_blank';
+                    card.className = 'link-card link-jira';
+                    card.innerHTML = `
+                        <div class="link-logo"><i class="fa-solid fa-ticket"></i></div>
+                        <div class="link-meta">
+                            <h4>Jira Issue (${ticket.key})</h4>
+                            <p>${ticket.url}</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square open-icon"></i>
+                    `;
+                    linksList.appendChild(card);
+                });
+            }
+
+            // GitHub Links
+            if (result.github_issues && result.github_issues.length > 0) {
+                hasLinks = true;
+                result.github_issues.forEach(issue => {
+                    const card = document.createElement('a');
+                    card.href = issue.url;
+                    card.target = '_blank';
+                    card.className = 'link-card link-github';
+                    card.innerHTML = `
+                        <div class="link-logo"><i class="fa-brands fa-github"></i></div>
+                        <div class="link-meta">
+                            <h4>GitHub Issue #${issue.number}</h4>
+                            <p>${issue.url}</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square open-icon"></i>
+                    `;
+                    linksList.appendChild(card);
+                });
+            }
+
+            if (!hasLinks) {
+                linksList.innerHTML = '<div class="no-links"><i class="fa-solid fa-triangle-exclamation"></i> No links generated. Make sure your Notion, Jira, or GitHub integration settings are active.</div>';
+            }
+        }
+
+        // --- Autonomous Auto-Pilot Recording & Sound Activation Logic ---
+        let autopilotActive = false;
+        let audioContext = null;
+        let analyser = null;
+        let microphoneStream = null;
+        let autopilotState = 'idle'; // 'idle', 'recording', 'countdown'
+        let silenceStartTime = null;
+        const SILENCE_TIMEOUT_MS = 8000;
+        const VOICE_THRESHOLD = 30; // Decibel threshold (0-255 scale)
+
+        function toggleAutopilot() {
+            const toggle = document.getElementById('autopilot-toggle');
+            const body = document.getElementById('autopilot-body');
+            autopilotActive = toggle.checked;
+            
+            if (autopilotActive) {
+                body.classList.add('active');
+                startAutopilotListening();
+            } else {
+                body.classList.remove('active');
+                stopAutopilotListening();
+            }
+        }
+
+        async function startAutopilotListening() {
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                
+                microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const source = audioContext.createMediaStreamSource(microphoneStream);
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                source.connect(analyser);
+                
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                const levelFill = document.getElementById('level-fill');
+                const indicator = document.getElementById('autopilot-indicator');
+                const countdown = document.getElementById('silence-countdown');
+                
+                autopilotState = 'idle';
+                indicator.innerHTML = '<i class="fa-solid fa-ear-listen"></i> Listening (Speak to start...)';
+                indicator.className = 'autopilot-indicator idle';
+                countdown.innerText = '';
+                
+                function analyzeVolume() {
+                    if (!autopilotActive) return;
+                    
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < bufferLength; i++) {
+                        sum += dataArray[i];
+                    }
+                    const average = sum / bufferLength;
+                    
+                    // Update level bar
+                    levelFill.style.width = Math.min(100, (average / 120) * 100) + '%';
+                    
+                    if (autopilotState === 'idle') {
+                        if (average > VOICE_THRESHOLD) {
+                            // Voice detected! Start recording automatically
+                            triggerAutopilotRecordStart();
+                        }
+                    } else if (autopilotState === 'recording') {
+                        if (average < VOICE_THRESHOLD) {
+                            // Silence detected! Start countdown
+                            autopilotState = 'countdown';
+                            silenceStartTime = Date.now();
+                            indicator.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Silence detected...';
+                            indicator.className = 'autopilot-indicator silence';
+                        }
+                    } else if (autopilotState === 'countdown') {
+                        if (average > VOICE_THRESHOLD) {
+                            // Speaking resumed! Cancel countdown
+                            autopilotState = 'recording';
+                            indicator.innerHTML = '<i class="fa-solid fa-microphone"></i> Auto-Recording...';
+                            indicator.className = 'autopilot-indicator recording-state';
+                            countdown.innerText = '';
+                        } else {
+                            // Calculate remaining silence time
+                            const elapsed = Date.now() - silenceStartTime;
+                            const remaining = Math.max(0, Math.ceil((SILENCE_TIMEOUT_MS - elapsed) / 1000));
+                            countdown.innerText = `Stopping in ${remaining}s...`;
+                            
+                            if (elapsed >= SILENCE_TIMEOUT_MS) {
+                                // Timeout reached! Auto stop and process
+                                triggerAutopilotRecordStop();
+                            }
+                        }
+                    }
+                    
+                    requestAnimationFrame(analyzeVolume);
+                }
+                
+                analyzeVolume();
+                
+            } catch (err) {
+                alert('Could not enable microphone for Auto-Pilot mode: ' + err.message);
+                document.getElementById('autopilot-toggle').checked = false;
+                toggleAutopilot();
+            }
+        }
+
+        function stopAutopilotListening() {
+            if (microphoneStream) {
+                microphoneStream.getTracks().forEach(track => track.stop());
+                microphoneStream = null;
+            }
+            if (isRecording) {
+                // If we were recording, stop it
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                recordBtn.classList.remove('recording');
+                waves.classList.remove('active');
+            }
+            autopilotState = 'idle';
+            document.getElementById('level-fill').style.width = '0%';
+            document.getElementById('silence-countdown').innerText = '';
+        }
+
+        async function triggerAutopilotRecordStart() {
+            if (isRecording) return;
+            try {
+                audioChunks = [];
+                mediaRecorder = new MediaRecorder(microphoneStream);
+                
+                mediaRecorder.addEventListener('dataavailable', event => {
+                    audioChunks.push(event.data);
+                });
+
+                mediaRecorder.addEventListener('stop', () => {
+                    recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(recordedBlob);
+                    playback.src = audioUrl;
+                    previewArea.style.display = 'block';
+                    recordStatus.innerText = 'Recording saved!';
+                    
+                    // Auto submit!
+                    startProcessing();
+                });
+
+                mediaRecorder.start();
+                isRecording = true;
+                recordBtn.classList.add('recording');
+                waves.classList.add('active');
+                recordStatus.innerText = 'Auto-Recording...';
+                
+                autopilotState = 'recording';
+                const indicator = document.getElementById('autopilot-indicator');
+                indicator.innerHTML = '<i class="fa-solid fa-microphone"></i> Auto-Recording...';
+                indicator.className = 'autopilot-indicator recording-state';
+            } catch (err) {
+                console.error("Failed to start media recorder in auto-pilot:", err);
+            }
+        }
+
+        function triggerAutopilotRecordStop() {
+            if (!isRecording) return;
+            mediaRecorder.stop();
+            isRecording = false;
+            recordBtn.classList.remove('recording');
+            waves.classList.remove('active');
+            
+            // Turn off autopilot checkbox after trigger
+            document.getElementById('autopilot-toggle').checked = false;
+            toggleAutopilot();
+        }
+
+        // --- Safe Local Storage Wrappers ---
+        function safeGetLocal(key) {
+            try {
+                return localStorage.getItem(key);
+            } catch (e) {
+                console.warn("localStorage access denied:", e);
+                return null;
+            }
+        }
+
+        function safeSetLocal(key, value) {
+            try {
+                localStorage.setItem(key, value);
+            } catch (e) {
+                console.warn("localStorage write denied:", e);
+            }
+        }
+
+        function safeRemoveLocal(key) {
+            try {
+                localStorage.removeItem(key);
+            } catch (e) {
+                console.warn("localStorage remove denied:", e);
+            }
+        }
+
+        // --- Local Storage API Keys Configuration Logic ---
+        function initLocalConfig() {
+            fetch('/api/config')
+                .then(r => r.json())
+                .then(backendKeys => {
+                    const fields = {
+                        'conf-azure-key': backendKeys.azure_api_key,
+                        'conf-azure-endpoint': backendKeys.azure_endpoint,
+                        'conf-github-pat': backendKeys.github_pat,
+                        'conf-github-repo': backendKeys.github_repo,
+                        'conf-notion-token': backendKeys.notion_token,
+                        'conf-notion-db': backendKeys.notion_database_id,
+                        'conf-sendgrid-key': backendKeys.sendgrid_api_key,
+                        'conf-from-email': backendKeys.from_email,
+                        'conf-jira-token': backendKeys.jira_api_token,
+                        'conf-jira-url': backendKeys.jira_url,
+                        'conf-jira-email': backendKeys.jira_email,
+                        'conf-jira-proj': backendKeys.jira_project_key
+                    };
+                    
+                    const localKeys = {};
+                    for (const [id, maskedVal] of Object.entries(fields)) {
+                        const input = document.getElementById(id);
+                        if (!input) continue;
+                        
+                        const saved = safeGetLocal(id);
+                        if (saved) {
+                            input.value = saved;
+                            localKeys[id] = saved;
+                        } else if (maskedVal) {
+                            input.placeholder = maskedVal;
+                        }
+                    }
+                    
+                    if (Object.keys(localKeys).length > 0) {
+                        syncLocalKeysToBackend(localKeys);
+                    }
+                })
+                .catch(err => console.error("Error loading credentials config:", err));
+        }
+
+        function syncLocalKeysToBackend(localKeys) {
+            const payload = {
+                azure_api_key: localKeys['conf-azure-key'],
+                azure_endpoint: localKeys['conf-azure-endpoint'],
+                github_pat: localKeys['conf-github-pat'],
+                github_repo: localKeys['conf-github-repo'],
+                notion_token: localKeys['conf-notion-token'],
+                notion_database_id: localKeys['conf-notion-db'],
+                sendgrid_api_key: localKeys['conf-sendgrid-key'],
+                from_email: localKeys['conf-from-email'],
+                jira_api_token: localKeys['conf-jira-token'],
+                jira_url: localKeys['conf-jira-url'],
+                jira_email: localKeys['conf-jira-email'],
+                jira_project_key: localKeys['conf-jira-proj']
+            };
+            
+            for (const key in payload) {
+                if (!payload[key]) {
+                    delete payload[key];
+                }
+            }
+            
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(data => {
+                console.log("Credentials automatically synced from local storage:", data);
+                checkStatus();
+            })
+            .catch(err => console.error("Failed to auto-sync local keys:", err));
+        }
+
+        function toggleSettings() {
+            const content = document.getElementById('settings-content');
+            const icon = document.getElementById('settings-toggle-icon');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.classList.add('active');
+            } else {
+                content.style.display = 'none';
+                icon.classList.remove('active');
+            }
+        }
+
+        function saveCredentials() {
+            const fields = [
+                'conf-azure-key', 'conf-azure-endpoint', 'conf-github-pat', 'conf-github-repo',
+                'conf-notion-token', 'conf-notion-db', 'conf-sendgrid-key', 'conf-from-email',
+                'conf-jira-token', 'conf-jira-url', 'conf-jira-email', 'conf-jira-proj'
+            ];
+            
+            const localKeys = {};
+            const payload = {};
+            
+            fields.forEach(id => {
+                const input = document.getElementById(id);
+                if (!input) return;
+                
+                const val = input.value.trim();
+                if (val && !val.includes('***') && !val.includes('********')) {
+                    safeSetLocal(id, val);
+                    localKeys[id] = val;
+                } else if (!val) {
+                    safeRemoveLocal(id);
+                }
+            });
+            
+            const payloadMap = {
+                'conf-azure-key': 'azure_api_key',
+                'conf-azure-endpoint': 'azure_endpoint',
+                'conf-github-pat': 'github_pat',
+                'conf-github-repo': 'github_repo',
+                'conf-notion-token': 'notion_token',
+                'conf-notion-db': 'notion_database_id',
+                'conf-sendgrid-key': 'sendgrid_api_key',
+                'conf-from-email': 'from_email',
+                'conf-jira-token': 'jira_api_token',
+                'conf-jira-url': 'jira_url',
+                'conf-jira-email': 'jira_email',
+                'conf-jira-proj': 'jira_project_key'
+            };
+            
+            for (const [id, val] of Object.entries(localKeys)) {
+                payload[payloadMap[id]] = val;
+            }
+            
+            if (Object.keys(payload).length === 0) {
+                alert("Please fill in configuration values to sync.");
+                return;
+            }
+            
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(async r => {
+                const data = await r.json();
+                if (!r.ok) throw new Error(data.detail || "Server error");
+                return data;
+            })
+            .then(data => {
+                alert("API credentials saved & synchronized successfully!");
+                checkStatus();
+            })
+            .catch(err => {
+                alert("Failed to sync credentials: " + err.message);
+            });
+        }
+    </script>
+</body>
+</html>
