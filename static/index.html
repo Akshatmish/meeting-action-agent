@@ -714,9 +714,9 @@
             // WebVTT / SRT clean up
             let cleanText = content;
             cleanText = cleanText.replace(/^WEBVTT\s*/i, '');
-            cleanText = cleanText.replace(/\d{2}:\d{2}:\d{2}[.,]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[.,]\d{3}/g, '');
-            cleanText = cleanText.replace(/\d{2}:\d{2}[.,]\d{3}\s*-->\s*\d{2}:\d{2}[.,]\d{3}/g, '');
-            cleanText = cleanText.replace(/\d{2}:\d{2}\s*-->\s*\d{2}:\d{2}/g, '');
+            cleanText = cleanText.replace(new RegExp('\\d{2}:\\d{2}:\\d{2}[.,]\\d{3}\\s*-->\\s*\\d{2}:\\d{2}:\\d{2}[.,]\\d{3}', 'g'), '');
+            cleanText = cleanText.replace(new RegExp('\\d{2}:\\d{2}[.,]\\d{3}\\s*-->\\s*\\d{2}:\\d{2}[.,]\\d{3}', 'g'), '');
+            cleanText = cleanText.replace(new RegExp('\\d{2}:\\d{2}\\s*-->\\s*\\d{2}:\\d{2}', 'g'), '');
             cleanText = cleanText.replace(/^\d+$/gm, '');
             
             let lines = cleanText.split('\n')

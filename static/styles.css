@@ -94,6 +94,7 @@ body {
     font-size: 38px;
     background: linear-gradient(135deg, var(--primary), var(--accent));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 2px 8px var(--primary-glow));
 }
@@ -105,6 +106,7 @@ body {
     letter-spacing: -0.5px;
     background: linear-gradient(to right, #c7d2fe, #a78bfa);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -731,6 +733,7 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus, input[type=
     margin-bottom: 5px;
     background: linear-gradient(135deg, var(--primary), var(--accent));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -1268,9 +1271,6 @@ body::before {
 /* Stepper step highlight */
 .step {
     transition: all 0.4s ease;
-}
-.step.running {
-    /* No movement — just opacity change handled inline */
 }
 
 /* Import Grid */
